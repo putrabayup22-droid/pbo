@@ -1,0 +1,11 @@
+class sepatu {
+constructor(merk, warna) {
+this.merk = merk;
+this.warna = warna;
+}
+info() {
+return 'sepatu ini adalah ${this.merk} berwarna ${this.warna}.';
+}
+}
+const adidas = new sepatu("Daikin Multi-S 3", "Putih");
+console.log(adidas.info());
