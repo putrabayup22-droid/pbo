@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Login PBO - LocalStorage</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f4f9; margin: 0; }
+        .card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 300px; text-align: center; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        .hidden { display: none; }
+        #userInfo { border-top: 1px solid #eee; margin-top: 20px; padding-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="card" id="app">
+        <div id="loginPage">
+            <h2>Login</h2>
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <button onclick="authSystem.login()">Masuk</button>
+        </div>
+
+        <div id="dashboardPage" class="hidden">
+            <h2 id="welcomeText"></h2>
+            <div id="userInfo">
+                <p><strong>Status:</strong> Online</p>
+                <p><strong>Role:</strong> Pengguna Terdaftar</p>
+            </div>
+            <button onclick="authSystem.logout()" style="background-color: #dc3545;">Keluar</button>
+        </div>
+    </div>
+
+    <script>
+        // 1. CLASS USER (Blueprint untuk data user)
+        class User {
+            constructor(username, password) {
+                this.username = username;
+                this.password = password;
+            }
+        }
+
+        // 2. CLASS AUTH SYSTEM (Logika PBO)
+        class AuthService {
+            constructor() {
+                this.dbKey = 'app_users';
+                this.initDatabase();
+            }
+
+            // Inisialisasi Database JSON di LocalStorage
+            initDatabase() {
+                if (!localStorage.getItem(this.dbKey)) {
+                    const initialUsers = [
+                        new User('admin', '12345'),
+                        new User('budi', 'pwpwbud'),
+                        new User('siti', 'siti2024')
+                    ];
+                    localStorage.setItem(this.dbKey, JSON.stringify(initialUsers));
+                }
+            }
+
+            getUsers() {
+                return JSON.parse(localStorage.getItem(this.dbKey));
+            }
+
+            login() {
+                const userInp = document.getElementById('username').value;
+                const passInp = document.getElementById('password').value;
+                const users = this.getUsers();
+
+                // Mencari user yang cocok menggunakan metode array find
+                const foundUser = users.find(u => u.username === userInp && u.password === passInp);
+
+                if (foundUser) {
+                    this.showDashboard(foundUser.username);
+                } else {
+                    alert("Gagal Login! Username atau password salah.");
+                }
+            }
+
+            showDashboard(name) {
+                document.getElementById('loginPage').classList.add('hidden');
+                document.getElementById('dashboardPage').classList.remove('hidden');
+                document.getElementById('welcomeText').innerText = `Hai, ${name}!`;
+            }
+
+            logout() {
+                document.getElementById('loginPage').classList.remove('hidden');
+                document.getElementById('dashboardPage').classList.add('hidden');
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+            }
+        }
+
+        // Instansiasi Objek
+        const authSystem = new AuthService();
+    </script>
+</body>
+</html>
